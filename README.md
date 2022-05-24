@@ -1,34 +1,89 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# Regen
+- Ensure maximum regen are in settings.
+- This value can almost never be more than the total output in kW.
+- Probably some efficiency loss here, 0.9?
 
-First, run the development server:
+# DC to AC Inverter Efficiency
+- Standard around 95%
+- SiC around 97.5%
 
-```bash
-npm run dev
-# or
-yarn dev
-```
+# Motor Efficiency
+- EPact 84% - 92.5%
+- NEMA Premium and Super Premium 86.5% - 94.1%
+- Permanent Magnet efficiency = 92% - 97%
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Rolling resistance
+- Car tire: 0.010 - 0.015
+- Rain on road: 0.02
+- Snow on road: 0.05 - 0.075
+- Gravel road: 0.020 - 0.035
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Tire contact area
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+# Heater Consumption
 
-## Learn More
+- Calculate watts required to maintain cabin temperature compared to ambient temperature.
+- Calculate watts required to maintain battery at 15-35° (20-25°C I think is best)
+- Wind chill on cabin?
 
-To learn more about Next.js, take a look at the following resources:
+Heat pumps generally are around 700W - 1000W and will generate heat around 2-3kW
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Resistance heat:
+  Around 20C - 0W
+  Around 10C - 300W
+  Around 0C (freezing point) 1000W
+  Around -10C - 2000W
+  Around -20C - 3000W
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+With heat pump:
+  Around 20C - 0W
+  Around 10C - 100W
+  Around 0C (freezing point) 200W
+  Around -10C - 700W
+  Around -20C - 3000W
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+
+
+
+
+
+
+# Parameters
+
+## Environmental
+- Speed (km/h)
+- Incline (%)
+- Temperature (C°)
+- Humidity (%)
+- Wind Speed (head, m/s)
+- Air Pressure (absolute, pascal)
+- Reference height (above sea level, m)
+
+## Vehicle params
+- Mass (kg)
+- Load (kg)
+- Motor (watts)
+- Maximum regen (watts)
+- Drag coefficient
+- Rolling coefficient
+  - wheel size, paving type
+- Drag reference area (m2)
+- DC-AC motor inverter efficiency (%)
+  - presets: standard, SiC
+- Motor efficiency
+  - min (%)
+  - max (%)
+  - speed at max (km/h)
+  - presets: EPact, NEMA, Permanent Magnet
+- Heater (watts)
+    - heated seats (50W per seat)
+
+## Trailer
+- Weight (kg)
+- Drag coefficient
+- Drag reference area (m2)

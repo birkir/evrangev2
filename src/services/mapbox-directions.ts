@@ -1,8 +1,6 @@
 import * as turf from "@turf/turf";
 import axios from "axios";
 import polyline from "@mapbox/polyline";
-import { Route } from "../types/route";
-import mockData from "../mock/mapbox-directions.mock.json";
 import { FeatureCollection, Geometry, Point } from "@turf/turf";
 
 export interface Leg {

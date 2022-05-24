@@ -18,7 +18,7 @@ type Kilograms = number;
 type Watts = number;
 type Kilowatts = number;
 
-interface VehicleData {
+export interface VehicleData {
   mass: Kilograms;
   dragReferenceArea: SquareMeters;
   dragCoefficient: number;

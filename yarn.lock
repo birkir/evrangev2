@@ -215,6 +215,11 @@
   dependencies:
     react-transition-group "^4.4.2"
 
+"@mantine/spotlight@4.2.6":
+  version "4.2.6"
+  resolved "https://registry.yarnpkg.com/@mantine/spotlight/-/spotlight-4.2.6.tgz#bb2915c8e6dd6aa26cdd821538e72bace55b65ec"
+  integrity sha512-ErjhSbY/8SMw/pTX0TW/+bSlLXYr2WNglJkwbU03dEc+0u/bNo0sMdoOaXVhIvwUmo8oUwj58TRsr3yLw5+cWQ==
+
 "@mantine/ssr@4.2.5":
   version "4.2.5"
   resolved "https://registry.yarnpkg.com/@mantine/ssr/-/ssr-4.2.5.tgz#745c0b20e255bc29e9a67985a25c89668d1ed1ba"

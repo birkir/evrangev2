@@ -19,7 +19,9 @@ import {
   Autocomplete,
   Loader,
   CardSection,
+  LoadingOverlay,
 } from "@mantine/core";
+import { SpotlightProvider } from "@mantine/spotlight";
 import { TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import React, { useEffect, useRef, useState } from "react";
@@ -39,9 +41,11 @@ import {
   consumption,
 } from "../services/consumption-service";
 import { GeoFeatCollection } from "../types/utils";
-import { Location } from "tabler-icons-react";
+import { Location, Search } from "tabler-icons-react";
 import useSWR from "swr";
 import Map, { Layer, MapRef, Source, useMap } from "react-map-gl";
+import { Params } from "../components/params";
+import { vehiclesActions } from "../utils/cars";
 
 const ACCESS_TOKEN =
   "pk.eyJ1Ijoic29saWRyNTMiLCJhIjoiY2sxa3QybXd5MG83NjNvcDdvbHhub2Z3MCJ9.821Ad9_hAdHVatpXsrnIbg";
@@ -122,183 +126,6 @@ const formatDuration = (duration: number) => {
     return `${seconds}s`;
   }
 };
-
-function Params({ onChange }: { onChange: any }) {
-  const form = useForm({
-    initialValues: {
-      mass: 2105,
-      dragCoefficient: 0.28,
-      rollingCoefficient: 0.0125,
-      dragReferenceArea: 2.629,
-      heaterAcPower: 1000,
-      availableBatteryCapacity: 72500,
-      maximumRegenKilowatts: 225,
-      maximumPowerKilowatts: 239,
-      dcToACInverterEfficiency: 0.95,
-      batteryDischargeEfficiency: 0.9,
-      motorEfficiencyMax: 0.96,
-      motorEfficiencyMin: 0.85,
-      maxMotorEfficiencySpeed: 90,
-      "trailer.enabled": false,
-      "trailer.mass": 1200,
-      "trailer.dragCoefficient": 0.85,
-      "trailer.rollingCoefficient": 0.0125,
-      "trailer.dragReferenceArea": 2.85,
-      "trailer.axles": 1,
-    },
-  });
-
-  const onSubmit = (values: typeof form.values) => {
-    onChange({
-      mass: Number(values.mass),
-      dragCoefficient: Number(values.dragCoefficient),
-      rollingCoefficient: Number(values.rollingCoefficient),
-      dragReferenceArea: Number(values.dragReferenceArea),
-      heaterAcPower: Number(values.heaterAcPower),
-      availableBatteryCapacity: Number(values.availableBatteryCapacity),
-      maximumRegenKilowatts: Number(values.maximumRegenKilowatts),
-      maximumPowerKilowatts: Number(values.maximumPowerKilowatts),
-      dcToACInverterEfficiency: Number(values.dcToACInverterEfficiency),
-      batteryDischargeEfficiency: Number(values.batteryDischargeEfficiency),
-      motorEfficiencyMax: Number(values.motorEfficiencyMax),
-      motorEfficiencyMin: Number(values.motorEfficiencyMin),
-      maxMotorEfficiencySpeed: Number(values.maxMotorEfficiencySpeed),
-      trailer: values["trailer.enabled"]
-        ? {
-            mass: Number(values["trailer.mass"]),
-            dragCoefficient: Number(values["trailer.dragCoefficient"]),
-            rollingCoefficient: Number(values.rollingCoefficient),
-            dragReferenceArea: Math.max(
-              0.5,
-              Number(values["trailer.dragReferenceArea"]) -
-                Number(values.dragReferenceArea) * 0.5
-            ),
-            axles: Number(values["trailer.axles"]),
-          }
-        : undefined,
-    });
-  };
-
-  useEffect(() => {
-    onSubmit(form.values);
-  }, [form.values]);
-
-  return (
-    <Card>
-      <Title order={4}>Vehicle</Title>
-      <form onSubmit={form.onSubmit(onSubmit)}>
-        <Grid>
-          <Grid.Col span={6}>
-            <TextInput
-              required
-              size="xs"
-              label="Mass"
-              type="number"
-              step="50"
-              rightSection="kg"
-              {...form.getInputProps("mass")}
-            />
-            <TextInput
-              required
-              size="xs"
-              type="number"
-              step="0.01"
-              label="Drag Coefficient"
-              {...form.getInputProps("dragCoefficient")}
-            />
-            <TextInput
-              required
-              size="xs"
-              type="number"
-              step="0.01"
-              label="Drag Reference Area"
-              rightSection="m²"
-              {...form.getInputProps("dragReferenceArea")}
-            />
-            <TextInput
-              required
-              size="xs"
-              type="number"
-              step="0.001"
-              label="Rolling Coefficient"
-              {...form.getInputProps("rollingCoefficient")}
-            />
-            <TextInput
-              required
-              size="xs"
-              type="number"
-              step="250"
-              label="Heater AC Power"
-              rightSection="W"
-              {...form.getInputProps("heaterAcPower")}
-            />
-          </Grid.Col>
-          <Grid.Col span={6}>
-            <Switch
-              label="Trailer"
-              onChange={(value) =>
-                form.setFieldValue(
-                  "trailer.enabled",
-                  value.currentTarget.checked
-                )
-              }
-              checked={form.values["trailer.enabled"]}
-            />
-            <TextInput
-              required
-              size="xs"
-              label="Mass"
-              rightSection="kg"
-              type="number"
-              step="10"
-              disabled={!form.values["trailer.enabled"]}
-              {...form.getInputProps("trailer.mass")}
-            />
-            <TextInput
-              required
-              size="xs"
-              label="Drag Coefficient"
-              type="number"
-              step="0.01"
-              disabled={!form.values["trailer.enabled"]}
-              {...form.getInputProps("trailer.dragCoefficient")}
-            />
-            <TextInput
-              required
-              size="xs"
-              label="Frontal Area"
-              rightSection="m²"
-              type="number"
-              step="0.01"
-              disabled={!form.values["trailer.enabled"]}
-              {...form.getInputProps("trailer.dragReferenceArea")}
-            />
-            {/* <TextInput
-              required
-              size="xs"
-              label="Rolling Coefficient"
-              disabled={!form.values["trailer.enabled"]}
-              {...form.getInputProps("trailer.rollingCoefficient")}
-            /> */}
-            <NativeSelect
-              size="xs"
-              label="Axles"
-              disabled={!form.values["trailer.enabled"]}
-              data={[
-                { value: "1", label: "1 axle" },
-                { value: "2", label: "2 axles" },
-              ]}
-              {...form.getInputProps("trailer.axles")}
-            />
-          </Grid.Col>
-        </Grid>
-        <Group position="right" mt="md">
-          <Button type="submit">Update</Button>
-        </Group>
-      </form>
-    </Card>
-  );
-}
 
 const ResultTable = React.memo(
   function ResultTable({
@@ -461,11 +288,16 @@ const RouteMap = ({
   }, [line, map]);
 
   return (
-    <Card mb="xl">
+    <Card
+      mb="xl"
+      style={{ padding: 0, overflow: "hidden" }}
+      shadow="md"
+      radius="md"
+    >
       <Map
         ref={ref}
         mapboxAccessToken={ACCESS_TOKEN}
-        mapStyle="mapbox://styles/mapbox/dark-v9"
+        mapStyle="mapbox://styles/mapbox/streets-v11"
         initialViewState={{
           longitude: -20,
           latitude: 65,
@@ -601,9 +433,15 @@ const Home: NextPage = () => {
   const [route, setRoute] =
     useState<GeoFeatCollection<CollectionRequiredConsumptionProperties>>();
   const [features, setFeatures] = useState<FeatureStep[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (values: typeof form.values) => {
     setRouteParams(form.values);
+    setLoading(true);
+    (window as any).gtag?.("event", "submit_route", {
+      event_category: "route",
+      event_label: "Submit route",
+    });
     if (values.from && values.to) {
       const rt0 = await directions(
         [
@@ -617,6 +455,7 @@ const Home: NextPage = () => {
       // @todo calculate consumption, do another directions with charging stations.
       setRoute(rt2);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -629,46 +468,72 @@ const Home: NextPage = () => {
   }, [route, params]);
 
   return (
-    <Container size="lg">
+    <Container size="xl" mt="lg">
+      <Title mb="xl">EV Range (v2)</Title>
       <Grid mb="lg">
-        <Grid.Col span={4}>
-          <Card>
+        <Grid.Col md={12} lg={4}>
+          <Card style={{ height: "100%" }}>
+            <LoadingOverlay visible={loading} />
             <Title order={4}>Route</Title>
-            <form onSubmit={form.onSubmit(onSubmit)}>
-              <LocationAutocomplete
-                label="From"
-                defaultValue={form.values.from}
-                onChange={(v) => {
-                  form.setFieldValue("from", v);
-                }}
-              />
-              <LocationAutocomplete
-                label="To"
-                defaultValue={form.values.to}
-                onChange={(v) => {
-                  form.setFieldValue("to", v);
-                }}
-              />
-              <TimeInput
-                label="Departure"
-                mb="xs"
-                {...form.getInputProps("departure")}
-              />
-              <Group position="right" mt="md">
-                <Button type="submit">Submit</Button>
-              </Group>
-            </form>
+            {route ? (
+              <div>
+                <Text mt="md" mb="xs">
+                  From
+                </Text>
+                <Title order={4}>{form.values.from?.title}</Title>
+                <Text>to</Text>
+                <Title order={4}>{form.values.to?.title}</Title>
+                <Text mt="xs" mb="xl">
+                  Departure at{" "}
+                  {form.values.departure.toISOString().substring(16, 11)}
+                </Text>
+                <Button
+                  onClick={() => {
+                    setRoute(undefined);
+                    setFeatures([]);
+                    setResults(undefined);
+                  }}
+                >
+                  Change route
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={form.onSubmit(onSubmit)}>
+                <LocationAutocomplete
+                  label="From"
+                  defaultValue={form.values.from}
+                  onChange={(v) => {
+                    form.setFieldValue("from", v);
+                  }}
+                />
+                <LocationAutocomplete
+                  label="To"
+                  defaultValue={form.values.to}
+                  onChange={(v) => {
+                    form.setFieldValue("to", v);
+                  }}
+                />
+                <TimeInput
+                  label="Departure"
+                  mb="xs"
+                  {...form.getInputProps("departure")}
+                />
+                <Group position="right" mt="md">
+                  <Button type="submit">Submit</Button>
+                </Group>
+              </form>
+            )}
           </Card>
         </Grid.Col>
-        <Grid.Col span={4}>
-          <Params onChange={setParams} />
+        <Grid.Col md={12} lg={4}>
+          <Params onChange={setParams} enabled={!!results} />
         </Grid.Col>
-        <Grid.Col span={4}>
-          {results && (
-            <Card>
-              <Title order={4} mb="sm">
-                Results
-              </Title>
+        <Grid.Col md={12} lg={4}>
+          <Card style={{ height: "100%" }}>
+            <Title order={4} mb="sm">
+              Results
+            </Title>
+            {results && (
               <Stack>
                 <Card.Section>
                   <Text component="span" size="sm" weight={700}>
@@ -722,12 +587,12 @@ const Home: NextPage = () => {
                   <Text>{formatDuration(results?.totalDuration)}</Text>
                 </Card.Section>
               </Stack>
-            </Card>
-          )}
+            )}
+          </Card>
         </Grid.Col>
       </Grid>
       <RouteMap features={features} params={params} />
-      <ResultTable steps={features} params={params} />
+      {/* <ResultTable steps={features} params={params} /> */}
     </Container>
   );
 };

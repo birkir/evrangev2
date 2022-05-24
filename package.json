@@ -16,6 +16,7 @@
     "@mantine/modals": "4.2.5",
     "@mantine/next": "4.2.5",
     "@mantine/notifications": "4.2.5",
+    "@mantine/spotlight": "4.2.6",
     "@mapbox/polyline": "1.1.1",
     "@turf/turf": "6.5.0",
     "axios": "0.27.2",
